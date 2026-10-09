@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'security.dart';
 import 'file_scanner.dart';
+import 'history_privacy.dart';
 
 void main() => runApp(const FoxSecuraApp());
 
@@ -90,7 +91,7 @@ class _DashboardState extends State<Dashboard> {
   Future<void> _inspect() async {
     final result = UrlInspector.inspect(url.text);
     setState(() => inspected = result);
-    await _record('Vérification URL', url.text.trim(), result.hasWarning);
+    await _record('Vérification URL', HistoryPrivacy.urlHostOnly(url.text), result.hasWarning);
   }
 
   Future<void> _scanFile() async {
@@ -101,7 +102,7 @@ class _DashboardState extends State<Dashboard> {
       if (!mounted || result == null) return;
       setState(() => fileResult = result);
       // Never persist a selected file's contents or its full path.
-      await _record('Analyse signature de test', result.name, result.testSignatureFound);
+      await _record('Analyse signature de test', HistoryPrivacy.fileSummary(), result.testSignatureFound);
     } catch (e) {
       if (mounted) setState(() => message = 'Analyse impossible : $e');
     } finally {
