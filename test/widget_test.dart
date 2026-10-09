@@ -1,11 +1,27 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (C) 2026 FoxSecura contributors
 
+import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/material.dart' show AppLifecycleState;
+import 'package:flutter/material.dart' show AppLifecycleState, MaterialApp, OutlinedButton;
+import 'package:foxsecura_mobile/catalog_update_manager.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foxsecura_mobile/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+
+class SlowCatalogStore implements CatalogStore {
+  final pending = Completer<String?>();
+
+  @override
+  Future<String?> read(String key) {
+    if (key == CatalogUpdateManager.activeKey) return pending.future;
+    return Future<String?>.value(null);
+  }
+
+  @override
+  Future<void> write(String key, String value) async {}
+}
 
 void main() {
   testWidgets('FoxSecura dashboard renders on launch', (tester) async {
@@ -77,4 +93,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(prefs.getStringList('foxsecura_history'), isEmpty);
   });
+  testWidgets('file scan stays disabled until signed cache restoration completes',
+      (tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final store = SlowCatalogStore();
+    final manager = CatalogUpdateManager(
+      store: store,
+      trustedPublicKey: List<int>.filled(32, 3),
+    );
+    await tester.pumpWidget(MaterialApp(
+      home: Dashboard(catalogueManager: manager),
+    ));
+    await tester.pump();
+    final finder = find.widgetWithText(
+      OutlinedButton, 'Choisir et analyser un fichier');
+    expect(tester.widget<OutlinedButton>(finder).onPressed, isNull);
+
+    store.pending.complete(null);
+    await tester.pumpAndSettle();
+    expect(tester.widget<OutlinedButton>(finder).onPressed, isNotNull);
+  });
+
 }

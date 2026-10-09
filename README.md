@@ -39,6 +39,18 @@ Sur iOS, le sandbox interdit une analyse arbitraire des autres applications. Sur
 - Conservation maximale : **30 jours et 30 entrées**, sans chiffrement au repos.
   Consultez [docs/PRIVACY.md](docs/PRIVACY.md) pour les limitations.
 
+## V0.6 — Catalogues de signatures signés
+
+Le moteur peut vérifier un catalogue Ed25519 signé, appliquer une séquence
+strictement croissante et restaurer hors ligne un cache revérifié.
+Il ne télécharge jamais les fichiers analysés par l'utilisateur.
+
+**Aucune clé publique officielle ni base de signatures malware réelles
+ne sont livrées** : le build standard reste limité au test EICAR et
+n'active pas les mises à jour automatiques.
+
+Lire [le protocole signé](docs/SIGNED_UPDATES.md) avant tout déploiement.
+
 ## Développement
 
 ```bash

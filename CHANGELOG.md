@@ -8,6 +8,17 @@ sera possible. Les fonctionnalités sont encore expérimentales.
 
 ## [Unreleased]
 
+### V0.6 — Chaîne de catalogues signés (pré-production)
+- Gestionnaire de manifestes Ed25519 avec cache revérifié au redémarrage.
+- Compteur de séquence local et rejet des mises à jour anciennes ou répétées.
+- Téléchargement borné via une origine HTTPS fixe, sans redirections ;
+  désactivé par défaut sans clé publique authentifiée dans le binaire.
+- Intégration des catalogues vérifiés au scanner SHA-256 et état affiché.
+- Tests pour faux éditeur, fichiers falsifiés, coupure d'écriture, rollback
+  local, retour au mode démonstration et reprise hors ligne.
+- Rappel : aucune signature malware réelle ni antirollback matériel intégré.
+
+
 ### V0.5 — Renforcement confidentialité et scanner (en développement)
 - Corrections de revue : nouvelles dates en UTC, conversion des horodatages
   avec fuseau et suppression des anciens horodatages ambigus sans fuseau.
