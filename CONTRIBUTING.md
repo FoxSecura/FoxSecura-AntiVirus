@@ -50,6 +50,12 @@ captures d'écran si l'UI change, et effets sur permissions/confidentialité.
 Une revue mainteneur est attendue avant fusion. La CI est utile, mais
 **ne remplace pas** la validation sur appareils physiques.
 
+## Types de contributions utiles
+
+Les tests, la documentation, l'accessibilité, les audits de permissions,
+l'internationalisation, les performances et la recherche de faux positifs
+sont aussi précieux que les nouvelles fonctionnalités.
+
 ## Droits d'auteur et licence
 
 Les contributions proposées sont destinées à être distribuées selon
@@ -60,8 +66,6 @@ cession automatique de propriété intellectuelle à FoxSecura.
 Le code tiers reste soumis à ses propres notices et conditions compatibles.
 Pour une modification substantielle de licence, ouvrez une discussion préalable.
 
-## Types de contributions utiles
+---
 
-Les tests, la documentation, l'accessibilité, les audits de permissions,
-l'internationalisation, les performances et la recherche de faux positifs
-sont aussi précieux que les nouvelles fonctionnalités.
+Copyright © 2026 FoxSecura contributors.
