@@ -35,7 +35,8 @@ class FoxSecuraApp extends StatelessWidget {
 }
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  const Dashboard({super.key, this.catalogueManager});
+  final CatalogUpdateManager? catalogueManager;
   @override
   State<Dashboard> createState() => _DashboardState();
 }
@@ -49,10 +50,13 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   VerifiedCatalog? activeCatalog;
   String? catalogueMessage;
   bool catalogueLoading = false;
-  late final CatalogUpdateManager catalogueManager = CatalogUpdateManager(
-    store: const PreferencesCatalogStore(),
-    trustedPublicKey: CatalogTrustConfig.pinnedPublicKey(),
-  );
+  bool catalogueRestoring = true;
+  late final Future<void> catalogueReady;
+  late final CatalogUpdateManager catalogueManager =
+      widget.catalogueManager ?? CatalogUpdateManager(
+        store: const PreferencesCatalogStore(),
+        trustedPublicKey: CatalogTrustConfig.pinnedPublicKey(),
+      );
   String? message;
   bool loading = false;
   int section = 0;
@@ -65,7 +69,7 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     _historyQueue = _load().catchError((Object error, StackTrace stack) {
       debugPrint('Chargement de l’historique impossible : $error');
     });
-    _loadCatalogue();
+    catalogueReady = _loadCatalogue();
   }
 
   // Queue every history read/write so a refresh cannot overwrite a scan,
@@ -147,14 +151,25 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
 
   Future<void> _loadCatalogue() async {
-    final loaded = await catalogueManager.load();
-    if (mounted) {
-      setState(() => activeCatalog = loaded);
+    try {
+      final loaded = await catalogueManager.load();
+      if (mounted) {
+        setState(() => activeCatalog = loaded);
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() => catalogueMessage = 'Cache non vérifiable : $error');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => catalogueRestoring = false);
+      }
     }
   }
 
   Future<void> _updateCatalogue() async {
-    if (catalogueLoading || !catalogueManager.isConfigured ||
+    if (catalogueLoading || catalogueRestoring ||
+        !catalogueManager.isConfigured ||
         CatalogTrustConfig.updateBaseUrl.isEmpty) {
       return;
     }
@@ -182,9 +197,12 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   Future<void> _scanFile() async {
-    if (loading) return;
+    if (loading || catalogueRestoring) return;
     setState(() { loading = true; message = null; });
     try {
+      // Never scan using EICAR fallback while verified cache is still loading.
+      await catalogueReady;
+      if (!mounted) return;
       final result = await FileScanner.pickAndScan(catalogue: activeCatalog);
       if (!mounted || result == null) return;
       setState(() => fileResult = result);
@@ -237,7 +255,7 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     const Text('Contrôle SHA-256 local contre le catalogue disponible. Un non-match ne prouve pas la sécurité.'),
     const SizedBox(height: 12),
     OutlinedButton.icon(
-      onPressed: loading ? null : _scanFile,
+      onPressed: (loading || catalogueRestoring) ? null : _scanFile,
       icon: const Icon(Icons.insert_drive_file_outlined),
       label: const Text('Choisir et analyser un fichier'),
     ),
@@ -276,7 +294,8 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
             CatalogTrustConfig.updateBaseUrl.isNotEmpty) ...[
           const SizedBox(height: 8),
           OutlinedButton.icon(
-            onPressed: catalogueLoading ? null : _updateCatalogue,
+            onPressed: (catalogueLoading || catalogueRestoring)
+                ? null : _updateCatalogue,
             icon: const Icon(Icons.system_update_alt),
             label: Text(catalogueLoading
               ? 'Vérification en cours…' : 'Vérifier les mises à jour'),

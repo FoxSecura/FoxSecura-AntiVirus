@@ -24,6 +24,16 @@ class HttpsCatalogTransport {
       ..connectionTimeout = timeout
       ..autoUncompress = false;
     try {
+      // Hard wall-clock deadline for the WHOLE endpoint download.
+      // Per-chunk Stream.timeout alone can be evaded by a trickle response.
+      return await _readResponse(client, uri, maximum).timeout(timeout);
+    } finally {
+      client.close(force: true);
+    }
+  }
+
+  static Future<Uint8List> _readResponse(
+      HttpClient client, Uri uri, int maximum) async {
       final request = await client.getUrl(uri).timeout(timeout);
       request.followRedirects = false;
       final response = await request.close().timeout(timeout);
@@ -43,9 +53,6 @@ class HttpsCatalogTransport {
         chunks.add(chunk);
       }
       return chunks.takeBytes();
-    } finally {
-      client.close(force: true);
-    }
   }
 
   static Future<VerifiedCatalog> update({
