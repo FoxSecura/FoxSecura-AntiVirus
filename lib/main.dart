@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'security.dart';
+import 'file_scanner.dart';
 
 void main() => runApp(const FoxSecuraApp());
 
@@ -39,6 +40,7 @@ class _DashboardState extends State<Dashboard> {
   final history = <String>[];
   AuditReport? audit;
   UrlResult? inspected;
+  FileScanResult? fileResult;
   String? message;
   bool loading = false;
   int section = 0;
@@ -91,6 +93,22 @@ class _DashboardState extends State<Dashboard> {
     await _record('Vérification URL', url.text.trim(), result.hasWarning);
   }
 
+  Future<void> _scanFile() async {
+    if (loading) return;
+    setState(() { loading = true; message = null; });
+    try {
+      final result = await FileScanner.pickAndScan();
+      if (!mounted || result == null) return;
+      setState(() => fileResult = result);
+      // Never persist a selected file's contents or its full path.
+      await _record('Analyse signature de test', result.name, result.testSignatureFound);
+    } catch (e) {
+      if (mounted) setState(() => message = 'Analyse impossible : $e');
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
+  }
+
   Future<void> _clearHistory() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('foxsecura_history');
@@ -126,6 +144,27 @@ class _DashboardState extends State<Dashboard> {
       Text(audit!.platform, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ...audit!.findings.map(_finding),
     ],
+    const SizedBox(height: 20),
+    const Text('Fichier sélectionné', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+    const Text('Contrôle SHA-256 local contre la signature de test EICAR. Sans base antivirus réelle.'),
+    const SizedBox(height: 12),
+    OutlinedButton.icon(
+      onPressed: loading ? null : _scanFile,
+      icon: const Icon(Icons.insert_drive_file_outlined),
+      label: const Text('Choisir et analyser un fichier'),
+    ),
+    if (fileResult != null) Card(child: ListTile(
+      leading: Icon(fileResult!.testSignatureFound
+        ? Icons.warning_amber_rounded : Icons.info_outline,
+        color: fileResult!.testSignatureFound ? Colors.orangeAccent : mint),
+      title: Text(fileResult!.testSignatureFound
+        ? 'Signature EICAR de test reconnue'
+        : 'Aucune signature de test reconnue'),
+      subtitle: Text('${fileResult!.name} · ${fileResult!.bytes} octets\n'
+        'SHA-256 : ${fileResult!.sha256}\n'
+        'Un résultat négatif ne garantit pas la sécurité du fichier.'),
+      isThreeLine: true,
+    )),
     const SizedBox(height: 24),
     Card(child: ListTile(
       leading: const Icon(Icons.link, color: mint),

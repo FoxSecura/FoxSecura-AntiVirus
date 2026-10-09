@@ -1,13 +1,15 @@
 name: foxsecura_mobile
 description: FoxSecura Mobile - security posture audit and offline URL inspection
 publish_to: none
-version: 0.1.0+1
+version: 0.2.0+2
 environment:
   sdk: '>=3.5.0 <4.0.0'
 dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.5.3
+  file_picker: ^8.3.7
+  crypto: ^3.0.6
 dev_dependencies:
   flutter_test:
     sdk: flutter
