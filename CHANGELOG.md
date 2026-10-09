@@ -9,6 +9,19 @@ sera possible. Les fonctionnalités sont encore expérimentales.
 ## [Unreleased]
 
 ### Added
+- Vérificateur expérimental de manifestes de signatures Ed25519 : validation
+  avant lecture du JSON, limites de taille, schéma strict, séquence croissante.
+- Tests cryptographiques contre falsification, clé incorrecte et ancien numéro.
+- Documentation de sécurité et plan de gestion des clés.
+
+### Security
+- Le chargement réseau et l'activation de manifestes distants restent
+  désactivés tant qu'une clé publique authentique et une protection
+  persistante contre le rollback ne sont pas déployées.
+
+## [0.3.0] - 2026-10-09
+
+### Added
 - Catalogue de signatures local versionné (`SignatureCatalog`), actuellement
   limité à l'empreinte SHA-256 du fichier de test inoffensif EICAR.
 - Tests du catalogue de signatures et de la réduction des données conservées.
