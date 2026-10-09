@@ -9,6 +9,18 @@ sera possible. Les fonctionnalités sont encore expérimentales.
 ## [Unreleased]
 
 ### Added
+- Workflow GitHub Actions `Build Android Test APK` produisant un APK Android
+  de test signé avec la clé de débogage Flutter et publié comme artefact de CI.
+- Icône Android FoxSecura générée depuis une déclinaison vectorielle du logo
+  fourni et script reproductible de génération des densités Android.
+- Guide d'installation et de récupération des APK de test.
+
+### Security
+- Aucun keystore de production ajouté au dépôt et aucune diffusion sur un store.
+- Les APK de test sont destinés à des appareils de développement uniquement.
+
+
+### Added
 - Catalogue de signatures local versionné (`SignatureCatalog`), actuellement
   limité à l'empreinte SHA-256 du fichier de test inoffensif EICAR.
 - Tests du catalogue de signatures et de la réduction des données conservées.
