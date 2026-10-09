@@ -33,7 +33,7 @@ class HistoryPrivacy {
   static List<String> sanitizeStoredRecords(Iterable<String> rawRecords, {
     DateTime? now,
   }) {
-    // All comparisons use a UTC instant, independent of device time zone.
+    // Compare only UTC instants so traveling cannot change retention.
     final reference = (now ?? DateTime.now()).toUtc();
     final oldest = reference.subtract(retention);
     final newestAllowed = reference.add(const Duration(minutes: 5));
@@ -45,57 +45,10 @@ class HistoryPrivacy {
         final data = jsonDecode(raw);
         if (data is! Map<String, dynamic>) continue;
         final timestamp = data['time'];
-        // Old app releases wrote local wall-clock timestamps without an
-        // offset. Their original instant cannot be reconstructed after a
-        // time-zone change; discard rather than misapply the 30-day policy.
+        // Old releases wrote local wall-clock timestamps without an offset.
+        // Their true instant is unknown after traveling: discard them.
         if (timestamp is! String ||
-            !RegExp(r'(?:Z|[+-]\\d{2}:\\d{2})
-
-        final kind = data['type'];
-        final detail = data['detail'];
-        String safeType;
-        String safeDetail;
-        switch (kind) {
-          case 'Vérification URL':
-            safeType = 'Vérification URL';
-            safeDetail = urlHostOnly(detail is String ? detail : '');
-          case 'Analyse signature de test':
-          case 'Analyse fichier':
-            safeType = 'Analyse signature de test';
-            safeDetail = fileSummary();
-          case 'Audit appareil':
-            safeType = 'Audit appareil';
-            final platform = detail is String ? detail : '';
-            safeDetail = RegExp(r'^(Android|iOS) [A-Za-z0-9._-]{1,32}$')
-                    .hasMatch(platform)
-                ? platform
-                : 'Appareil audité (détails non conservés)';
-          default:
-            safeType = 'Ancien évènement';
-            safeDetail = 'Détails non conservés';
-        }
-
-        records.add((
-          time,
-          jsonEncode({
-            'time': time.toIso8601String(),
-            'type': safeType,
-            'detail': safeDetail,
-            'warning': data['warning'] == true,
-          }),
-        ));
-      } on FormatException {
-        // Ignore malformed historic records.
-      } on TypeError {
-        // Ignore records not matching the expected JSON value types.
-      }
-    }
-
-    records.sort((a, b) => b.$1.compareTo(a.$1));
-    return records.take(maximumEntries).map((entry) => entry.$2).toList();
-  }
-}
-).hasMatch(timestamp)) {
+            !RegExp(r'(?:Z|[+-]\d{2}:\d{2})$').hasMatch(timestamp)) {
           continue;
         }
         final time = DateTime.tryParse(timestamp)?.toUtc();
