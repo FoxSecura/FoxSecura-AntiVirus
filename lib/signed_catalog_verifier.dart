@@ -2,7 +2,6 @@
 // Copyright (C) 2026 FoxSecura contributors
 
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
 
 import 'signature_catalog.dart';
