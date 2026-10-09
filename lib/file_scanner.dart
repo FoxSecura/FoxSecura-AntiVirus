@@ -4,6 +4,7 @@
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
+import 'signature_catalog.dart';
 
 /// The sole bundled signature is the harmless EICAR test string.
 /// A non-match does NOT mean a file is safe.
@@ -46,6 +47,6 @@ class FileScanner {
     final digest = await sha256.bind(file.openRead()).first;
     final hash = digest.toString();
     return FileScanResult(
-      displayName ?? file.uri.pathSegments.last, hash, hash == eicarSha256, stat.size);
+      displayName ?? file.uri.pathSegments.last, hash, SignatureCatalog.matchHash(hash)?.isTestOnly == true, stat.size);
   }
 }
