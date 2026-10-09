@@ -1,16 +1,44 @@
-# Confidentialité de l'historique
+# Confidentialité de l'historique — V0.5
 
-Depuis la prochaine version, les nouvelles vérifications d'URL ne conservent
-que le schéma, le domaine et le port dans l'historique. Les noms des fichiers
-choisis pour le scan EICAR ne sont plus conservés.
+FoxSecura conserve un historique **local et non chiffré** via
+`shared_preferences`. Ce mécanisme n'est pas un coffre sécurisé ; il
+n'est pas adapté aux données personnelles sensibles ni aux secrets.
 
-Les résultats restent enregistrés avec `shared_preferences` sur l'appareil :
-cette méthode ne constitue pas un coffre-fort chiffré. En particulier,
-les entrées écrites par les versions antérieures peuvent encore contenir
-des URL complètes ou des noms de fichiers.
+## Données conservées
 
-**Action conseillée après mise à niveau :** ouvrir l'onglet Historique et
-sélectionner **Effacer** pour supprimer ces anciennes entrées.
+- Contrôle d'URL : **schéma, hôte et port** uniquement, sans nom d'utilisateur,
+  mot de passe, chemin, paramètres de requête ni fragment.
+- Contrôle de fichier : catégorie et résultat, sans nom ou chemin du fichier.
+- Audit de l'appareil : nom et version du système si le format est reconnu.
+- Évènements : date et indicateur d'alerte.
 
-La prochaine évolution devra utiliser un stockage chiffré avec stratégie de
-rétention et migration explicites.
+## Migration et rétention
+
+Au démarrage, les entrées écrites par les anciennes versions sont **traitées
+avant leur affichage** : les champs non reconnus et les détails suspects sont
+effacés ; les URL sont réduites à leur domaine ; les noms de fichiers sont
+retirés. Les entrées corrompues ou anciennes sont supprimées du stockage local.
+
+La conservation est limitée à **30 jours et 30 évènements maximum**.
+Les nouvelles dates sont enregistrées en **UTC**, et les dates avec fuseau
+explicite sont comparées comme des instants UTC. Les anciennes dates
+enregistrées **sans fuseau horaire** sont supprimées lors de la migration :
+leur instant d'origine est impossible à établir de manière sûre après un
+changement de fuseau. Ce choix privilégie la confidentialité à la
+conservation des anciens évènements.
+
+La rétention est réappliquée au lancement de l'application, lors de
+l'ouverture de l'onglet Historique, à la reprise de l'application et
+avant toute nouvelle écriture. Une suppression manuelle reste disponible
+dans l'onglet Historique. Un historique affiché en continu sans interaction
+peut rester visible jusqu'au prochain de ces évènements.
+
+Ces opérations n'effacent **pas forcément** les traces restant dans des
+sauvegardes système, des instantanés ou un stockage forensique antérieur.
+Pour une confidentialité plus forte, une version future devra utiliser
+un stockage chiffré, une migration de sauvegardes et une politique
+d'exclusion de sauvegarde documentée.
+
+Aucune URL ou contenu de fichier n'est envoyé à une API par le scanner
+actuel. Les améliorations futures nécessiteront une revue de consentement,
+des permissions et des traitements de données.

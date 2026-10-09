@@ -43,10 +43,20 @@ class FileScanner {
     if (stat.size > maxBytes) {
       throw StateError('Fichier trop volumineux : maximum 25 Mio.');
     }
-    // Streaming keeps file contents out of app history and avoids full-file buffering.
-    final digest = await sha256.bind(file.openRead()).first;
+    // Enforce the size limit WHILE streaming too: a file may grow after stat().
+    // Contents never enter app history and are not fully buffered in memory.
+    var bytesRead = 0;
+    final bounded = file.openRead().map((chunk) {
+      bytesRead += chunk.length;
+      if (bytesRead > maxBytes) {
+        throw StateError('Fichier trop volumineux : maximum 25 Mio.');
+      }
+      return chunk;
+    });
+    final digest = await sha256.bind(bounded).first;
     final hash = digest.toString();
     return FileScanResult(
-      displayName ?? file.uri.pathSegments.last, hash, SignatureCatalog.matchHash(hash)?.isTestOnly == true, stat.size);
+      displayName ?? file.uri.pathSegments.last, hash,
+      SignatureCatalog.matchHash(hash)?.isTestOnly == true, bytesRead);
   }
 }
