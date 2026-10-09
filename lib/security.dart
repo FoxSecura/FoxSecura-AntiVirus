@@ -72,7 +72,7 @@ class UrlInspector {
     }
     if (uri.hasPort && uri.port != (uri.scheme == 'https' ? 443 : 80)) {
       findings.add(Finding('Port non standard',
-        'Port ${uri.port} : vérifie le service attendu.', 'info'));
+        'Port ${uri.port} : vérifie le service attendu.', 'warning'));
     }
     if (host.length > 65 || host.split('.').length > 5) {
       findings.add(const Finding('Domaine complexe',
