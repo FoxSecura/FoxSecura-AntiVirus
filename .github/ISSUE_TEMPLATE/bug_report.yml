@@ -1,0 +1,43 @@
+name: "🐛 Rapport de bug"
+description: "Décrire un comportement reproductible (sans divulguer de vulnérabilité)."
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "⚠️ Pour une vulnérabilité non corrigée, consultez SECURITY.md et ne publiez pas les détails ici."
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Plateforme
+      options:
+        - Android
+        - iOS
+        - Flutter / partagé
+        - Documentation / CI
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description et étapes de reproduction
+      placeholder: "1. Ouvrir… 2. Cliquer… 3. Observer…"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportement attendu
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      placeholder: "V0.1, commit SHA…"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environnement et logs anonymisés
+      description: "N'incluez ni secrets, ni données personnelles, ni URL contenant des jetons."

@@ -40,3 +40,23 @@ flutter run
 ```
 
 L'exécution sur appareils physiques Android/iOS doit être validée avant toute distribution publique.
+
+## Licence
+
+FoxSecura AntiVirus est diffusé sous **GNU Affero General Public License v3.0 only**
+(`AGPL-3.0-only`). Le texte complet figure dans [LICENSE](LICENSE).
+Les dépendances tierces conservent leurs licences respectives.
+L'AGPL-3.0 prévoit notamment des obligations de mise à disposition du code
+source pour les versions distribuées et certaines utilisations via un réseau.
+La licence du code ne constitue pas une autorisation d'utiliser les marques
+de FoxSecura.
+
+## Contribuer
+
+Les contributions sont les bienvenues. Commencer par
+[CONTRIBUTING.md](CONTRIBUTING.md) et [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+Voir également [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) et
+[SECURITY.md](SECURITY.md) avant de déclarer un problème sensible.
+
+Les propositions passent par une pull request et les vérifications
+automatisées de `Flutter checks`.

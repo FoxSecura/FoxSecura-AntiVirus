@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 FoxSecura contributors
+
 import 'package:flutter/services.dart';
 
 class Finding {
@@ -67,7 +70,7 @@ class UrlInspector {
       findings.add(const Finding('Adresse IP directe',
         'Une IP littérale mérite une vérification manuelle.', 'warning'));
     }
-    if (uri.hasPort && uri.port != 80 && uri.port != 443) {
+    if (uri.hasPort && uri.port != (uri.scheme == 'https' ? 443 : 80)) {
       findings.add(Finding('Port non standard',
         'Port ${uri.port} : vérifie le service attendu.', 'info'));
     }

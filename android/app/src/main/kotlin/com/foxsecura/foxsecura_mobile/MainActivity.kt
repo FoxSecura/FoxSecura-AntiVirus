@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 FoxSecura contributors
+
 package com.foxsecura.foxsecura_mobile
 
 import android.app.KeyguardManager
