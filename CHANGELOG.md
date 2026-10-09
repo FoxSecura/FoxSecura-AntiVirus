@@ -9,6 +9,15 @@ sera possible. Les fonctionnalités sont encore expérimentales.
 ## [Unreleased]
 
 ### Added
+- CI GitHub Actions pour construire et publier un APK Android debug de test.
+- Icône de lancement FoxSecura dérivée du logo du projet, et script de génération.
+- Guide pour installer et récupérer l'APK de test.
+
+### Security
+- Aucun secret de signature de production utilisé : APK debug uniquement.
+
+
+### Added
 - Vérificateur expérimental de manifestes de signatures Ed25519 : validation
   avant lecture du JSON, limites de taille, schéma strict, séquence croissante.
 - Tests cryptographiques contre falsification, clé incorrecte et ancien numéro.
