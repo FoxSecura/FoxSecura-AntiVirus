@@ -2,6 +2,9 @@
 // Copyright (C) 2026 FoxSecura contributors
 
 import 'dart:io';
+import 'dart:convert';
+import 'package:cryptography/cryptography.dart';
+import 'package:foxsecura_mobile/signed_catalog_verifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:foxsecura_mobile/file_scanner.dart';
 
@@ -24,6 +27,32 @@ void main() {
     final report = await FileScanner.scanLocalFile(path);
     expect(report.testSignatureFound, isFalse);
     expect(report.sha256.length, 64);
+  });
+
+  test('scanner consumes a signature-verified catalog', () async {
+    final file = File(dir.path + '/eicar-test.txt');
+    await file.writeAsString(
+      r'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
+    final pair = await Ed25519().newKeyPair();
+    final bytes = utf8.encode(jsonEncode({
+      'sequence': 2,
+      'version': 'signed-test',
+      'entries': [{
+        'id': 'EICAR-TEST-FILE',
+        'sha256': FileScanner.eicarSha256,
+        'description': 'EICAR harmless test',
+        'isTestOnly': true,
+      }]
+    }));
+    final signature = await Ed25519().sign(bytes, keyPair: pair);
+    final catalog = await SignedCatalogVerifier(
+      trustedPublicKey: (await pair.extractPublicKey()).bytes,
+    ).verify(payload: bytes, signature: signature.bytes,
+        minimumSequence: 1);
+    final report = await FileScanner.scanLocalFile(file, catalogue: catalog);
+    expect(report.signatureFound, isTrue);
+    expect(report.testSignatureFound, isTrue);
+    expect(report.catalogueVersion, 'signed-test');
   });
 
   test('rejects files above configured size limit', () async {
