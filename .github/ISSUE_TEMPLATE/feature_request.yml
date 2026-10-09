@@ -1,0 +1,29 @@
+name: "✨ Proposition de fonctionnalité"
+description: "Proposer une amélioration concrète et décrire sa valeur."
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problème à résoudre
+      description: "Quel risque ou quel besoin utilisateur est concerné ?"
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solution proposée
+      description: "Décrivez l'interface et les APIs Android/iOS envisagées."
+    validations:
+      required: true
+  - type: textarea
+    id: limits
+    attributes:
+      label: Permissions, confidentialité et limitations
+      description: "Données touchées, fausses alertes possibles et limites des plateformes."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives envisagées

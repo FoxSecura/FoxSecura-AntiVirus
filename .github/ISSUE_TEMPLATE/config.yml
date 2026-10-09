@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "🔒 Signalement privé de sécurité"
+    url: https://github.com/FoxSecura/FoxSecura-AntiVirus/security
+    about: "Consulter SECURITY.md et l'onglet Security. Ne publiez pas les failles non corrigées dans une issue."
+  - name: "📖 Contribuer"
+    url: https://github.com/FoxSecura/FoxSecura-AntiVirus/blob/main/CONTRIBUTING.md
+    about: "Guide de contribution (disponible sur main après fusion de la PR)."
