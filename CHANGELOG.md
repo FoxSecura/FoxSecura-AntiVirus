@@ -9,16 +9,26 @@ sera possible. Les fonctionnalités sont encore expérimentales.
 ## [Unreleased]
 
 ### Added
-- Workflow GitHub Actions `Build Android Test APK` produisant un APK Android
-  de test signé avec la clé de débogage Flutter et publié comme artefact de CI.
-- Icône Android FoxSecura générée depuis une déclinaison vectorielle du logo
-  fourni et script reproductible de génération des densités Android.
-- Guide d'installation et de récupération des APK de test.
+- CI GitHub Actions pour construire et publier un APK Android debug de test.
+- Icône de lancement FoxSecura dérivée du logo du projet, et script de génération.
+- Guide pour installer et récupérer l'APK de test.
 
 ### Security
-- Aucun keystore de production ajouté au dépôt et aucune diffusion sur un store.
-- Les APK de test sont destinés à des appareils de développement uniquement.
+- Aucun secret de signature de production utilisé : APK debug uniquement.
 
+
+### Added
+- Vérificateur expérimental de manifestes de signatures Ed25519 : validation
+  avant lecture du JSON, limites de taille, schéma strict, séquence croissante.
+- Tests cryptographiques contre falsification, clé incorrecte et ancien numéro.
+- Documentation de sécurité et plan de gestion des clés.
+
+### Security
+- Le chargement réseau et l'activation de manifestes distants restent
+  désactivés tant qu'une clé publique authentique et une protection
+  persistante contre le rollback ne sont pas déployées.
+
+## [0.3.0] - 2026-10-09
 
 ### Added
 - Catalogue de signatures local versionné (`SignatureCatalog`), actuellement
