@@ -30,7 +30,7 @@ void main() {
   });
 
   test('scanner consumes a signature-verified catalog', () async {
-    final file = File(dir.path + '/eicar-test.txt');
+    final file = File('${dir.path}/eicar-test.txt');
     await file.writeAsString(
       r'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
     final pair = await Ed25519().newKeyPair();

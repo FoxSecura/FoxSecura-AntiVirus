@@ -148,27 +148,36 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   Future<void> _loadCatalogue() async {
     final loaded = await catalogueManager.load();
-    if (mounted) setState(() => activeCatalog = loaded);
+    if (mounted) {
+      setState(() => activeCatalog = loaded);
+    }
   }
 
   Future<void> _updateCatalogue() async {
     if (catalogueLoading || !catalogueManager.isConfigured ||
-        CatalogTrustConfig.updateBaseUrl.isEmpty) return;
+        CatalogTrustConfig.updateBaseUrl.isEmpty) {
+      return;
+    }
     setState(() { catalogueLoading = true; catalogueMessage = null; });
     try {
       final verified = await HttpsCatalogTransport.update(
         base: Uri.parse(CatalogTrustConfig.updateBaseUrl),
         manager: catalogueManager,
       );
-      if (mounted) setState(() {
-        activeCatalog = verified;
-        catalogueMessage = 'Catalogue signé activé : ' + verified.version;
-      });
+      if (mounted) {
+        setState(() {
+          activeCatalog = verified;
+          catalogueMessage = 'Catalogue signé activé : ${verified.version}';
+        });
+      }
     } catch (error) {
-      if (mounted) setState(() =>
-          catalogueMessage = 'Mise à jour refusée : $error');
+      if (mounted) {
+        setState(() => catalogueMessage = 'Mise à jour refusée : $error');
+      }
     } finally {
-      if (mounted) setState(() => catalogueLoading = false);
+      if (mounted) {
+        setState(() => catalogueLoading = false);
+      }
     }
   }
 
@@ -243,7 +252,7 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         : 'Aucune signature connue reconnue'),
       subtitle: Text('${fileResult!.name} · ${fileResult!.bytes} octets\n'
         'SHA-256 : ${fileResult!.sha256}\n'
-        'Catalogue : ' + fileResult!.catalogueVersion + '\n' +
+        'Catalogue : ${fileResult!.catalogueVersion}\n'
         'Un résultat négatif ne garantit pas la sécurité du fichier.'),
       isThreeLine: true,
     )),
@@ -257,8 +266,8 @@ class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         const SizedBox(height: 8),
         Text(activeCatalog == null
           ? 'Mode démonstration EICAR : aucune base de malwares active.'
-          : 'Catalogue signé : ' + activeCatalog!.version +
-            ' · signatures : ' + activeCatalog!.entries.length.toString()),
+          : 'Catalogue signé : ${activeCatalog!.version} · '
+            'signatures : ${activeCatalog!.entries.length}'),
         if (!catalogueManager.isConfigured)
           const Padding(padding: EdgeInsets.only(top: 8),
             child: Text('Mises à jour désactivées : clé éditeur absente.',
