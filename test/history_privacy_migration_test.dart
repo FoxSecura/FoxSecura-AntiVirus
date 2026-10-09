@@ -71,6 +71,39 @@ void main() {
     expect(result.single, isNot(contains('password')));
   });
 
+  test('normalizes offsets to UTC instants for retention', () {
+    final stamped = jsonEncode({
+      'time': '2026-10-09T21:00:00+02:00',
+      'type': 'Audit appareil',
+      'detail': 'iOS 17.1',
+      'warning': false,
+    });
+    final result = HistoryPrivacy.sanitizeStoredRecords([stamped], now: now);
+    expect(result, hasLength(1));
+    final data = jsonDecode(result.single) as Map<String, dynamic>;
+    expect(data['time'], '2026-10-09T19:00:00.000Z');
+  });
+
+  test('rejects expired offset timestamps despite travel', () {
+    final stamped = jsonEncode({
+      'time': '2026-09-09T14:00:00+14:00',
+      'type': 'Audit appareil',
+      'detail': 'Android 14',
+      'warning': false,
+    });
+    expect(HistoryPrivacy.sanitizeStoredRecords([stamped], now: now), isEmpty);
+  });
+
+  test('drops ambiguous legacy local timestamps without zone', () {
+    final stamped = jsonEncode({
+      'time': '2026-10-09T20:00:00.000',
+      'type': 'Vérification URL',
+      'detail': 'https://alice:secret@example.com/?token=secret',
+      'warning': true,
+    });
+    expect(HistoryPrivacy.sanitizeStoredRecords([stamped], now: now), isEmpty);
+  });
+
   test('does not keep invalid URL input or oversized domain in history', () {
     expect(HistoryPrivacy.urlHostOnly('malformed user token'),
       contains('URL invalide'));

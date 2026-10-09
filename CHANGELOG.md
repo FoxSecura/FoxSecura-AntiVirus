@@ -9,6 +9,10 @@ sera possible. Les fonctionnalités sont encore expérimentales.
 ## [Unreleased]
 
 ### V0.5 — Renforcement confidentialité et scanner (en développement)
+- Corrections de revue : nouvelles dates en UTC, conversion des horodatages
+  avec fuseau et suppression des anciens horodatages ambigus sans fuseau.
+- Réapplication de la rétention à l'ouverture de l'historique et à la reprise
+  de l'application ; opérations d'historique sérialisées contre les courses.
 - Migration automatique des anciens historiques : URL réduite à origine
   (protocole/domaine/port), suppression des noms de fichiers et détails inconnus.
 - Expiration des évènements de plus de 30 jours et limite de 30 entrées.

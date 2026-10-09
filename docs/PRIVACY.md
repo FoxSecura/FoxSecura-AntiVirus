@@ -20,7 +20,18 @@ effacés ; les URL sont réduites à leur domaine ; les noms de fichiers sont
 retirés. Les entrées corrompues ou anciennes sont supprimées du stockage local.
 
 La conservation est limitée à **30 jours et 30 évènements maximum**.
-Une suppression manuelle reste disponible dans l'onglet Historique.
+Les nouvelles dates sont enregistrées en **UTC**, et les dates avec fuseau
+explicite sont comparées comme des instants UTC. Les anciennes dates
+enregistrées **sans fuseau horaire** sont supprimées lors de la migration :
+leur instant d'origine est impossible à établir de manière sûre après un
+changement de fuseau. Ce choix privilégie la confidentialité à la
+conservation des anciens évènements.
+
+La rétention est réappliquée au lancement de l'application, lors de
+l'ouverture de l'onglet Historique, à la reprise de l'application et
+avant toute nouvelle écriture. Une suppression manuelle reste disponible
+dans l'onglet Historique. Un historique affiché en continu sans interaction
+peut rester visible jusqu'au prochain de ces évènements.
 
 Ces opérations n'effacent **pas forcément** les traces restant dans des
 sauvegardes système, des instantanés ou un stockage forensique antérieur.

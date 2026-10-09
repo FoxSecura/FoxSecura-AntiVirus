@@ -37,7 +37,7 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   final url = TextEditingController();
   final history = <String>[];
   AuditReport? audit;
@@ -46,12 +46,36 @@ class _DashboardState extends State<Dashboard> {
   String? message;
   bool loading = false;
   int section = 0;
-  late final Future<void> _historyLoaded;
+  late Future<void> _historyQueue;
 
   @override
   void initState() {
     super.initState();
-    _historyLoaded = _load();
+    WidgetsBinding.instance.addObserver(this);
+    _historyQueue = _load().catchError((Object error, StackTrace stack) {
+      debugPrint('Chargement de l’historique impossible : $error');
+    });
+  }
+
+  // Queue every history read/write so a refresh cannot overwrite a scan,
+  // or restore entries that were just deleted by the user.
+  Future<void> _enqueueHistory(Future<void> Function() work) {
+    final operation = _historyQueue.then((_) => work());
+    _historyQueue = operation.catchError((Object error, StackTrace stack) {
+      debugPrint('Opération sur l’historique impossible : $error');
+    });
+    return operation;
+  }
+
+  void _refreshHistory() {
+    _enqueueHistory(_load).catchError((Object error, StackTrace stack) {
+      debugPrint('Actualisation de l’historique impossible : $error');
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshHistory();
   }
 
   Future<void> _load() async {
@@ -70,24 +94,24 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
-  Future<void> _record(String kind, String detail, bool warning) async {
-    await _historyLoaded;
-    if (!mounted) return;
-    final item = jsonEncode({
-      'time': DateTime.now().toIso8601String(),
-      'type': kind,
-      'detail': detail,
-      'warning': warning,
-    });
-    final sanitized = HistoryPrivacy.sanitizeStoredRecords([item, ...history]);
-    setState(() {
-      history
-        ..clear()
-        ..addAll(sanitized);
-    });
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('foxsecura_history', sanitized);
-  }
+  Future<void> _record(String kind, String detail, bool warning) =>
+      _enqueueHistory(() async {
+        if (!mounted) return;
+        final item = jsonEncode({
+          'time': DateTime.now().toUtc().toIso8601String(),
+          'type': kind,
+          'detail': detail,
+          'warning': warning,
+        });
+        final sanitized = HistoryPrivacy.sanitizeStoredRecords([item, ...history]);
+        setState(() {
+          history
+            ..clear()
+            ..addAll(sanitized);
+        });
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setStringList('foxsecura_history', sanitized);
+      });
 
   Future<void> _audit() async {
     setState(() { loading = true; message = null; });
@@ -126,12 +150,11 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  Future<void> _clearHistory() async {
-    await _historyLoaded;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('foxsecura_history');
-    if (mounted) setState(() => history.clear());
-  }
+  Future<void> _clearHistory() => _enqueueHistory(() async {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('foxsecura_history');
+        if (mounted) setState(() => history.clear());
+      });
 
   Widget _finding(Finding item) => Card(
     child: ListTile(
@@ -241,6 +264,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     url.dispose();
     super.dispose();
   }
@@ -258,7 +282,10 @@ class _DashboardState extends State<Dashboard> {
       children: [_home(), _urls(), _history()])),
     bottomNavigationBar: NavigationBar(
       selectedIndex: section,
-      onDestinationSelected: (value) => setState(() => section = value),
+      onDestinationSelected: (value) {
+        setState(() => section = value);
+        if (value == 2) _refreshHistory();
+      },
       destinations: const [
         NavigationDestination(icon: Icon(Icons.shield_outlined), label: 'Sécurité'),
         NavigationDestination(icon: Icon(Icons.link), label: 'Liens'),
