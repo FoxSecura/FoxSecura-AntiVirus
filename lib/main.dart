@@ -2,6 +2,7 @@
 // Copyright (C) 2026 FoxSecura contributors
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'security.dart';
@@ -45,32 +46,47 @@ class _DashboardState extends State<Dashboard> {
   String? message;
   bool loading = false;
   int section = 0;
+  late final Future<void> _historyLoaded;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _historyLoaded = _load();
   }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    final stored = prefs.getStringList('foxsecura_history') ?? <String>[];
+    final sanitized = HistoryPrivacy.sanitizeStoredRecords(stored);
+    if (!listEquals(stored, sanitized)) {
+      // Remove historic full URLs, file names and expired records on upgrade.
+      await prefs.setStringList('foxsecura_history', sanitized);
+    }
     if (!mounted) return;
-    setState(() => history.addAll(prefs.getStringList('foxsecura_history') ?? []));
+    setState(() {
+      history
+        ..clear()
+        ..addAll(sanitized);
+    });
   }
 
   Future<void> _record(String kind, String detail, bool warning) async {
+    await _historyLoaded;
+    if (!mounted) return;
     final item = jsonEncode({
       'time': DateTime.now().toIso8601String(),
       'type': kind,
       'detail': detail,
       'warning': warning,
     });
+    final sanitized = HistoryPrivacy.sanitizeStoredRecords([item, ...history]);
     setState(() {
-      history.insert(0, item);
-      if (history.length > 30) history.removeRange(30, history.length);
+      history
+        ..clear()
+        ..addAll(sanitized);
     });
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('foxsecura_history', history);
+    await prefs.setStringList('foxsecura_history', sanitized);
   }
 
   Future<void> _audit() async {
@@ -111,9 +127,10 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<void> _clearHistory() async {
+    await _historyLoaded;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('foxsecura_history');
-    setState(() => history.clear());
+    if (mounted) setState(() => history.clear());
   }
 
   Widget _finding(Finding item) => Card(
@@ -203,7 +220,7 @@ class _DashboardState extends State<Dashboard> {
       TextButton(onPressed: history.isEmpty ? null : _clearHistory,
         child: const Text('Effacer')),
     ]),
-    const Text('Historique local non chiffré. Ne saisis pas d’URL contenant des secrets.'),
+    const Text('Historique local non chiffré : conservation maximale de 30 jours et 30 évènements. N’utilise pas d’URL contenant des secrets.'),
     const SizedBox(height: 12),
     if (history.isEmpty) const Text('Aucune analyse enregistrée.'),
     ...history.map((entry) {

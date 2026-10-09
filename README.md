@@ -24,9 +24,20 @@ Le dépôt conserve les sources propres ; `flutter create` génère les autres f
 
 ## Limitations et confidentialité
 
-Aucune détection générale de malware, aucune base de signatures de menaces réelles, protection réseau en temps réel, blocage de navigation ou mise en quarantaine. L'inspection d'URL est heuristique : faux positifs et faux négatifs possibles. Les URL de l'historique sont stockées localement sans chiffrement ; ne pas y saisir de secrets. Aucune API externe n'est contactée par les contrôles.
+Aucune détection générale de malware, aucune base de signatures de menaces réelles, protection réseau en temps réel, blocage de navigation ou mise en quarantaine. L'inspection d'URL est heuristique : faux positifs et faux négatifs possibles. L'historique local reste non chiffré, mais les URL sont réduites aux domaines, les noms de fichiers sont supprimés, et les anciennes données sont nettoyées à la lecture. L'historique est limité à 30 jours et 30 entrées ; ne pas y saisir de secrets. Aucune API externe n'est contactée par les contrôles.
 
 Sur iOS, le sandbox interdit une analyse arbitraire des autres applications. Sur Android, l'inventaire complet des applications nécessite un examen préalable des règles Google Play avant d'envisager `QUERY_ALL_PACKAGES`.
+
+## Scanner et confidentialité (V0.5)
+
+- Le contrôle de fichiers volontaires utilise SHA-256 local avec une limite de
+  25 Mio surveillée même pendant la lecture, et ne connaît toujours que la
+  signature de test EICAR. Un non-match **ne signifie pas** que le fichier est sain.
+- À la première ouverture, les anciens historiques de navigation et de fichiers
+  sont nettoyés avant affichage : seuls domaine/protocole/port, catégorie,
+  date et indicateur d'alerte peuvent rester.
+- Conservation maximale : **30 jours et 30 entrées**, sans chiffrement au repos.
+  Consultez [docs/PRIVACY.md](docs/PRIVACY.md) pour les limitations.
 
 ## Développement
 

@@ -8,6 +8,18 @@ sera possible. Les fonctionnalités sont encore expérimentales.
 
 ## [Unreleased]
 
+### V0.5 — Renforcement confidentialité et scanner (en développement)
+- Migration automatique des anciens historiques : URL réduite à origine
+  (protocole/domaine/port), suppression des noms de fichiers et détails inconnus.
+- Expiration des évènements de plus de 30 jours et limite de 30 entrées.
+- Contrôle de taille par flux pendant le SHA-256, pour les fichiers modifiés
+  entre la vérification de taille et la lecture.
+- Tests de migration et de régression de la confidentialité.
+
+**Limites conservées :** l'historique n'est pas chiffré, et le seul motif
+reconnu est encore le test inoffensif EICAR.
+
+
 ### Added
 - CI GitHub Actions pour construire et publier un APK Android debug de test.
 - Icône de lancement FoxSecura dérivée du logo du projet, et script de génération.

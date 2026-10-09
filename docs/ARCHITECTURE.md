@@ -1,11 +1,15 @@
-# Architecture V0.1 et modèle de menace
+# Architecture V0.5 et modèle de menace
 
 ## Flux
 
 ```text
 Flutter UI (lib/main.dart)
   ├─ Inspection des URL ──► lib/security.dart (règles locales)
-  ├─ Historique ──────────► shared_preferences (local, non chiffré)
+  ├─ Historique ──────────► minimisation + migration + TTL 30 j
+  │                           └─ shared_preferences (local, non chiffré)
+  ├─ Analyse d'un fichier ─► sélection volontaire + SHA-256 borné (25 Mio)
+  │                           └─ catalogue EICAR de test (local)
+  ├─ Vérification Ed25519 ─► SignedCatalogVerifier (pas d'activation distante)
   └─ Audit de l'appareil ─► MethodChannel foxsecura/device
                               ├─ Android / Kotlin : verrouillage, ADB,
                               │                   options développeur, correctif
@@ -30,7 +34,7 @@ Flutter UI (lib/main.dart)
 - Réseau, interception TLS, filtres VPN ou quarantaine.
 - Jailbreak/root fiable, attestation distante, anti-tampering et
   détection de compromission avancée.
-- Protection cryptographique des URL enregistrées dans l'historique.
+- Chiffrement de l'historique local (les détails sensibles hérités sont supprimés à l'ouverture).
 
 ## Améliorations candidates
 
