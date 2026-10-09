@@ -1,4 +1,9 @@
-# FoxSecura AntiVirus — Mobile V0.2
+# FoxSecura AntiVirus
+[![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Android](https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
+[![iOS](https://img.shields.io/badge/iOS-000000?logo=apple&logoColor=white)](https://developer.apple.com/ios/)
+[![License: AGPL v3](https://img.shields.io/badge/AGPL_v3-663399.svg?logo=gnu&logoColor=white)](https://github.com/FoxSecura/FoxSecura-AntiVirus/blob/main/LICENSE)
 
 Projet Flutter Android et iOS avec interface Material 3 sombre.
 
@@ -41,16 +46,6 @@ flutter run
 
 L'exécution sur appareils physiques Android/iOS doit être validée avant toute distribution publique.
 
-## Licence
-
-FoxSecura AntiVirus est diffusé sous **GNU Affero General Public License v3.0 only**
-(`AGPL-3.0-only`). Le texte complet figure dans [LICENSE](LICENSE).
-Les dépendances tierces conservent leurs licences respectives.
-L'AGPL-3.0 prévoit notamment des obligations de mise à disposition du code
-source pour les versions distribuées et certaines utilisations via un réseau.
-La licence du code ne constitue pas une autorisation d'utiliser les marques
-de FoxSecura.
-
 ## Contribuer
 
 Les contributions sont les bienvenues. Commencer par
@@ -61,6 +56,14 @@ Voir également [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) et
 Les propositions passent par une pull request et les vérifications
 automatisées de `Flutter checks`.
 
-## Scanner expérimental V0.2
+## Licence
 
-L'utilisateur choisit un fichier depuis le sélecteur de fichiers système ; aucun accès global aux autres applications ni balayage complet du téléphone. Le contenu n'est pas envoyé sur Internet. Le fichier est lu par flux pour calculer son SHA-256 et vérifier uniquement la signature de test EICAR. Une non-correspondance n'est **pas** une preuve d'innocuité. Le nom du fichier (mais pas son contenu ni son chemin complet) est enregistré dans l'historique local non chiffré : ne sélectionnez pas un fichier au nom sensible. Les grands fichiers (>25 Mio) sont refusés. Ce module doit encore être testé sur appareils physiques.
+FoxSecura AntiVirus est diffusé sous **GNU Affero General Public License v3.0 only**
+(`AGPL-3.0-only`). Le texte complet figure dans [LICENSE](LICENSE).
+Les dépendances tierces conservent leurs licences respectives.
+L'AGPL-3.0 prévoit notamment des obligations de mise à disposition du code
+source pour les versions distribuées et certaines utilisations via un réseau.
+La licence du code ne constitue pas une autorisation d'utiliser les marques
+de FoxSecura.
+
+Copyright © 2026 FoxSecura contributors.
