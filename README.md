@@ -22,14 +22,6 @@ flutter run
 
 Le dépôt conserve les sources propres ; `flutter create` génère les autres fichiers de plateforme avant analyse et tests. Ne pas utiliser `flutter create --overwrite` après personnalisation.
 
-## Ce que fait la V0.2
-
-- Audit Android via Kotlin : code de verrouillage, ADB, options développeur et date de correctif annoncée par l'OS.
-- Audit iOS via Swift : disponibilité de l'authentification propriétaire et version iOS.
-- Vérification **hors ligne** des indicateurs URL : HTTP, userinfo, punycode, IP directe, ports atypiques, domaines complexes.
-- Interface Flutter et historique local de trente derniers contrôles, stocké dans `shared_preferences`.
-- Sélection explicite d'un fichier et calcul SHA-256 local (jusqu'à 25 Mio), détection de la **seule** signature EICAR (chaîne de test inoffensive) sur Android et iOS.
-
 ## Limitations et confidentialité
 
 Aucune détection générale de malware, aucune base de signatures de menaces réelles, protection réseau en temps réel, blocage de navigation ou mise en quarantaine. L'inspection d'URL est heuristique : faux positifs et faux négatifs possibles. Les URL de l'historique sont stockées localement sans chiffrement ; ne pas y saisir de secrets. Aucune API externe n'est contactée par les contrôles.
